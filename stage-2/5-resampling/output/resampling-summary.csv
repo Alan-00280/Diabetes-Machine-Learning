@@ -1,0 +1,7 @@
+Metode,Outcome,Kategori,Jumlah,Persentase
+Sebelum,0,false,393,0.6605042016806723
+Sebelum,1,true,202,0.33949579831932775
+SMOTE,0,false,393,0.5
+SMOTE,1,true,393,0.5
+RUS,0,false,202,0.5
+RUS,1,true,202,0.5

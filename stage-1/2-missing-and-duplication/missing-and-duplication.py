@@ -1,5 +1,3 @@
-# Tolong ganti nama file template.py sesuaikan dengan bagianmu
-
 from pathlib import Path
 
 import numpy as np
