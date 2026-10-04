@@ -1,0 +1,4 @@
+Model,Accuracy,Precision,Recall,F1-Score,Train Size,Depth,Leaves
+Original,0.7718,0.7576,0.4902,0.5952,595,5,23
+SMOTE,0.698,0.5441,0.7255,0.6218,786,5,22
+RUS,0.745,0.5942,0.8039,0.6833,404,5,21
