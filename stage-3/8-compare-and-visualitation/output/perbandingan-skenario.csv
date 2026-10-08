@@ -1,0 +1,4 @@
+Model,Benar_Sehat,Alarm_Palsu,Luput,Benar_Diabetes,Accuracy,Precision,Recall,F1-Score,Skenario,Total_Uji,Total_Aktual_Sehat,Total_Aktual_Diabetes,Specificity,FPR,FNR
+Original,90,8,26,25,0.7718,0.7576,0.4902,0.5952,Baseline (tanpa resampling),149,98,51,0.9184,0.0816,0.5098
+SMOTE,67,31,14,37,0.698,0.5441,0.7255,0.6218,Oversampling (SMOTE),149,98,51,0.6837,0.3163,0.2745
+RUS,70,28,10,41,0.745,0.5942,0.8039,0.6833,Undersampling (RUS),149,98,51,0.7143,0.2857,0.1961
