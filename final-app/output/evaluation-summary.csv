@@ -1,0 +1,4 @@
+Skenario,Accuracy,Precision,Recall,F1-Score,TN,FP,FN,TP
+Baseline (Original),0.7718,0.7576,0.4902,0.5952,90,8,26,25
+Oversampling (SMOTE),0.698,0.5441,0.7255,0.6218,67,31,14,37
+Undersampling (RUS),0.745,0.5942,0.8039,0.6833,70,28,10,41
