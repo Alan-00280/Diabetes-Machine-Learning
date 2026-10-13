@@ -1,0 +1,4 @@
+Model,Accuracy,Precision,Recall,F1-Score,Train Size
+Original,0.7248,0.6087,0.549,0.5773,595
+SMOTE,0.6913,0.5362,0.7255,0.6167,786
+RUS,0.7248,0.5781,0.7255,0.6435,404
