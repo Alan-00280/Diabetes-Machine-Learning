@@ -1,0 +1,4 @@
+Model,Benar_Sehat,Alarm_Palsu,Luput,Benar_Diabetes,Accuracy,Precision,Recall,F1-Score
+Original,80,18,23,28,0.7248,0.6087,0.549,0.5773
+SMOTE,66,32,14,37,0.6913,0.5362,0.7255,0.6167
+RUS,71,27,14,37,0.7248,0.5781,0.7255,0.6435
