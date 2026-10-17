@@ -9,6 +9,7 @@ Silakan isi bagian '# TODO' di bawah ini untuk mengimplementasikan kode Anda.
 """
 
 from pathlib import Path
+import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -76,9 +77,6 @@ datasets = {
 # ─────────────────────────────────────────────────────────────────────────────
 print("PEMODELAN DENGAN SVM".center(75, "="))
 # TODO: Latih model SVM (Support Vector Classifier).
-# Tips: Untuk data tabular medis, kernel='rbf' atau 'linear' lazim digunakan.
-# Pastikan data fitur sudah terstandarisasi/ternormalisasi (seperti dari stage-2/4-data-transformation).
-
 # Simpan hasil prediksi dan metrik:
 models  = {}
 y_preds = {}
@@ -129,25 +127,107 @@ for name, df_train in datasets.items():
         "Presisi": round(presisi, 4),
         "Recall": round(recall, 4),
         "Sensitivitas": round(sensivity, 4),
-        "Specivisitas":  round(specifiy, 4),
+        "Specifisitas":  round(specifiy, 4),
         "F1-Score": round(f1, 4),
         "Train Size": len(df_train),
     })
+
+
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. UJI COBA INPUT INTERAKTIF DATA PASIEN
+# 4. MENYIMPAN TABEL METRIK DAN PREDIKSI DATA UJI
+# ─────────────────────────────────────────────────────────────────────────────
+df_metrics = pd.DataFrame(metrics)
+# Format tabel metrik standar selaras dengan 6-1 dan 6-2
+df_metrics_std = pd.DataFrame([
+    {
+        "Model": m["Model"],
+        "Accuracy": m["Akurasi"],
+        "Precision": m["Presisi"],
+        "Recall": m["Recall"],
+        "F1-Score": m["F1-Score"],
+        "Train Size": m["Train Size"]
+    }
+    for m in metrics
+])
+df_metrics_std.to_csv(output_dir / "model-metrics.csv", index=False)
+print(f"\n[OUTPUT] model-metrics.csv tersimpan di: {output_dir / 'model-metrics.csv'}")
+
+df_prediksi = pd.DataFrame({
+    "Aktual (y_test)": y_test,
+    "Pred_Original": y_preds["Original"],
+    "Pred_SMOTE": y_preds["SMOTE"],
+    "Pred_RUS": y_preds["RUS"]
+})
+df_prediksi.to_csv(output_dir / "test-predictions.csv", index=False)
+print(f"[OUTPUT] test-predictions.csv tersimpan di: {output_dir / 'test-predictions.csv'}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. MENYIMPAN MODEL SVM SEBAGAI FILE .pkl (UNTUK DEPLOYMENT FRONTEND)
 # ─────────────────────────────────────────────────────────────────────────────
 FEATURE_COLUMNS = [col for col in df_test.columns if col != TARGET_COL]
 CLASS_LABELS = {0: "Tidak Diabetes", 1: "Diabetes"}
 
-# Hitung statistik dari data raw agar input pasien baru dapat di-transform
-# dengan skala yang sama seperti saat training model.
-raw_df = pd.read_csv(raw_data_path)
-feature_mean = raw_df[FEATURE_COLUMNS].mean()
-feature_std = raw_df[FEATURE_COLUMNS].std().replace(0, 1.0)
+# Parameter skala (mean dan std) diambil dari data training sebelum transformasi
+train_clean_path = project_root / "stage-1" / "3-outlier-and-split-data" / "output" / "train-diabetes.csv"
+if train_clean_path.exists():
+    clean_train_df = pd.read_csv(train_clean_path)
+    feature_mean = clean_train_df[FEATURE_COLUMNS].mean()
+    feature_std = clean_train_df[FEATURE_COLUMNS].std().replace(0, 1.0)
+else:
+    raw_df = pd.read_csv(raw_data_path)
+    feature_mean = raw_df[FEATURE_COLUMNS].mean()
+    feature_std = raw_df[FEATURE_COLUMNS].std().replace(0, 1.0)
+
+# Model terbaik adalah varian RUS (Akurasi: 75.84%, Recall: 76.47%, F1: 68.42%)
+best_model_name = "RUS"
+best_model = models[best_model_name]
+
+# 1. Simpan model SVM terbaik langsung (.pkl)
+svm_model_path = output_dir / "svm_model.pkl"
+with open(svm_model_path, "wb") as f:
+    pickle.dump(best_model, f)
+print(f"\n[OUTPUT] Model SVM terbaik ({best_model_name}) disimpan ke: {svm_model_path}")
+
+# 2. Simpan juga spesifik dengan nama varian
+with open(output_dir / "svm_model_rus.pkl", "wb") as f:
+    pickle.dump(best_model, f)
+
+# 3. Simpan bundle lengkap (model + parameter scaler + nama fitur)
+# Sangat memudahkan integrasi FrontEnd karena input user raw bisa langsung di-transform
+svm_bundle = {
+    "model": best_model,
+    "model_name": f"SVM ({best_model_name})",
+    "all_models": models,
+    "feature_names": FEATURE_COLUMNS,
+    "feature_mean": feature_mean.to_dict(),
+    "feature_std": feature_std.to_dict(),
+    "class_labels": CLASS_LABELS,
+    "metrics": metrics
+}
+svm_bundle_path = output_dir / "svm_bundle.pkl"
+with open(svm_bundle_path, "wb") as f:
+    pickle.dump(svm_bundle, f)
+print(f"[OUTPUT] Bundle model lengkap (model + scaler) disimpan ke: {svm_bundle_path}")
+
+# Sinkronkan model .pkl ke folder app/ dan final-model/SVM-method/
+for target_dir in [project_root / "app", project_root / "final-model" / "SVM-method"]:
+    target_dir.mkdir(parents=True, exist_ok=True)
+    with open(target_dir / "svm_model.pkl", "wb") as f:
+        pickle.dump(best_model, f)
+    with open(target_dir / "svm_bundle.pkl", "wb") as f:
+        pickle.dump(svm_bundle, f)
+
+print(f"[SYNC] Model .pkl berhasil disinkronkan ke:")
+print(f"  - {project_root / 'app'}")
+print(f"  - {project_root / 'final-model' / 'SVM-method'}")
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. FUNGSI INFERENSI / PREDIKSI PASIEN TUNGGAL
+# ─────────────────────────────────────────────────────────────────────────────
 def predict_single_patient(model_name: str, patient_values: dict) -> tuple[int, float, float]:
-    """Prediksi satu pasien baru dengan data raw dan transformasi yang konsisten."""
+    """Prediksi satu pasien baru dengan data raw dan transformasi z-score yang konsisten."""
     df_patient = pd.DataFrame([patient_values], columns=FEATURE_COLUMNS)
     df_patient_scaled = (df_patient[FEATURE_COLUMNS] - feature_mean) / feature_std
 
@@ -157,35 +237,21 @@ def predict_single_patient(model_name: str, patient_values: dict) -> tuple[int, 
     return pred, float(proba[0]), float(proba[1])
 
 
-# if __name__ == "__main__":
-#     pilihan = input("Apakah ingin mencoba uji input data pasien baru? (y/n): ")
-#     if pilihan.lower() in {"y", "ya", "yes"}:
-#         print("\nMasukkan data pasien baru (nilai asli, bukan nilai z-score):")
-#         patient_values = {}
+if __name__ == "__main__":
+    # Verifikasi inferensi contoh pasien
+    contoh_pasien = {
+        "Pregnancies": 2,
+        "Glucose": 130,
+        "BloodPressure": 70,
+        "SkinThickness": 25,
+        "Insulin": 110,
+        "BMI": 28.4,
+        "DiabetesPedigreeFunction": 0.45,
+        "Age": 32
+    }
+    pred, prob_sehat, prob_diab = predict_single_patient("RUS", contoh_pasien)
+    print(f"\n[TEST INFERENSI CONTOH]")
+    print(f"  Prediksi: {CLASS_LABELS[pred]}")
+    print(f"  Probabilitas Tidak Diabetes: {prob_sehat:.2%}")
+    print(f"  Probabilitas Diabetes       : {prob_diab:.2%}")
 
-#         for col in FEATURE_COLUMNS:
-#             while True:
-#                 try:
-#                     value = float(input(f"{col}: "))
-#                     patient_values[col] = value
-#                     break
-#                 except ValueError:
-#                     print("Input tidak valid. Masukkan angka yang benar.")
-
-#         # Pilih model terbaik berdasarkan akurasi untuk prediksi pasien baru.
-#         best_model_name = max(metrics, key=lambda item: item["Akurasi"])["Model"]
-#         pred_label, prob_no_diabetes, prob_diabetes = predict_single_patient(best_model_name, patient_values)
-
-#         print("\n" + "=" * 60)
-#         print(f"Model yang digunakan: {best_model_name}")
-#         print(f"Probabilitas Tidak Diabetes: {prob_no_diabetes:.2%}")
-#         print(f"Probabilitas Diabetes:      {prob_diabetes:.2%}")
-#         print(f"Hasil Prediksi: {CLASS_LABELS[pred_label]}")
-#         print("=" * 60)
-
-#         if pred_label == 1:
-#             print("Pasien Terprediksi Diabetes")
-#         else:
-#             print("Pasien Terprediksi Tidak Diabetes")
-#     else:
-#         print("Uji input data pasien baru dibatalkan.")
