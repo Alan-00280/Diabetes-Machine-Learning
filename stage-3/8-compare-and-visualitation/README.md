@@ -1,43 +1,32 @@
-# Stage 3 - Compare and Visualisation
+# Stage 3 - Compare and Visualisation (Komparasi 3 Algoritma)
 
 ## Pemilik
-Luthfi Alan Perdana (NIM: 434241052)
+Raka (Anggota C)
 
 ## Deskripsi Tahap
-Tahap ini merupakan tahap akhir dari Stage 3 (Evaluasi dan Visualisasi) yang bertugas melakukan perbandingan komprehensif terhadap performa model Decision Tree di bawah tiga skenario penanganan dataset:
-1. **Skenario 1 (Baseline)**: Tanpa resampling (distribusi kelas asli yang tidak seimbang).
-2. **Skenario 2 (Oversampling)**: Penyeimbangan kelas menggunakan *Synthetic Minority Over-sampling Technique* (SMOTE).
-3. **Skenario 3 (Undersampling)**: Penyeimbangan kelas menggunakan *Random Under Sampling* (RUS).
+Tahap 8 merupakan tahap puncak dari **Stage 3: Evaluasi dan Komparasi** yang membandingkan kinerja dari ketiga algoritma klasifikasi:
+1. **Decision Tree** (dari `stage-3/7-1`)
+2. **Gaussian Naive Bayes** (dari `stage-3/7-2`)
+3. **Support Vector Machine / SVM** (dari `stage-3/7-3`)
 
-Tahap ini menghasilkan visualisasi komparatif berstandar publikasi serta rekapitulasi data metrik untuk mendukung analisis evaluasi, perbandingan antarskenario, dan pembahasan kinerja model.
+Masing-masing model dievaluasi pada tiga skenario perlakuan data latih:
+- **Original (Baseline)**: Data latih murni tanpa resampling (distribusi kelas timpang 66%:34%).
+- **SMOTE (Oversampling)**: Penyeimbangan kelas sintetis minoritas (786 sampel seimbang 1:1).
+- **RUS (Random Under-Sampling)**: Penyeimbangan kelas reduksi acak mayoritas (404 sampel seimbang 1:1).
+
+Total 9 konfigurasi model dievaluasi secara adil pada **149 data uji independen** (98 Tidak Diabetes & 51 Diabetes).
 
 ---
 
 ## Input
-- `stage-3/7-confusion-matrix/output/evaluation-metrics.csv`: Data metrik evaluasi dan matriks konfusi dari ketiga skenario.
-- `stage-2/6-decision-tree-and-testing/output/test-predictions.csv`: Data prediksi 149 sampel uji dari masing-masing model beserta label aktual.
-
----
-
-## Metode dan Metrik Evaluasi
-1. **Confusion Matrix Analysis**:
-   - Menghitung persentase terhadap kelas aktual pada setiap kuadran (True Negative, False Positive, False Negative, True Positive).
-   - Menganalisis implikasi klinis diagnosis medis pada setiap jenis kesalahan (khususnya bahaya kritis dari *False Negative*).
-2. **Metrik Komparasi Utama**:
-   - Akurasi: $\frac{\text{TN} + \text{TP}}{\text{Total}}$
-   - Presisi: $\frac{\text{TP}}{\text{TP} + \text{FP}}$
-   - Recall (Sensitivitas): $\frac{\text{TP}}{\text{TP} + \text{FN}}$
-   - F1-Score: $2 \times \frac{\text{Presisi} \times \text{Recall}}{\text{Presisi} + \text{Recall}}$
-3. **Analisis Kesalahan Medis**:
-   - Alarm Palsu / FP: Sehat namun diprediksi sakit.
-   - Luput / FN: Sakit namun diprediksi sehat (kesalahan berisiko tinggi).
-4. **Radar Multi-Metric Analysis**:
-   - Memetakan trade-off antara Akurasi, Presisi, Recall, F1-Score, dan Spesifisitas.
+- `stage-3/7-1-confusion-matrix-decision-tree/output/evaluation-metrics.csv`
+- `stage-3/7-2-confusion-matrix-naive-bayes/output/evaluation-metrics.csv`
+- `stage-3/7-3-confusion-matrix-svm/output/evaluation-metrics.csv`
 
 ---
 
 ## Cara Menjalankan
-Pastikan *virtual environment* Python sudah aktif, lalu jalankan dari root direktori proyek (`diabetes_uts`):
+Pastikan virtual environment Python (`.venv`) aktif, lalu jalankan dari root direktori:
 
 ```bash
 python stage-3/8-compare-and-visualitation/compare-and-visualisation.py
@@ -46,24 +35,31 @@ python stage-3/8-compare-and-visualitation/compare-and-visualisation.py
 ---
 
 ## Output
-Semua artefak visualisasi dan data disimpan di folder `output/`:
-1. `gambar-4-15-cm-baseline.png` — Visualisasi individual Confusion Matrix Skenario 1 (Baseline) lengkap dengan persentase baris dan metrik.
-2. `gambar-4-16-cm-oversampling.png` — Visualisasi individual Confusion Matrix Skenario 2 (Oversampling SMOTE).
-3. `gambar-4-17-cm-undersampling.png` — Visualisasi individual Confusion Matrix Skenario 3 (Undersampling RUS).
-4. `gambar-4-18-perbandingan-kinerja.png` — Gambar 4.18 berupa multi-panel visualisasi yang menggabungkan grafik perbandingan 4 metrik evaluasi dan grafik analisis kesalahan diagnosis medis (FP vs FN).
-5. `perbandingan-metrik.png` — Salinan grafik perbandingan metrik evaluasi.
-6. `perbandingan-radar.png` — Radar chart trade-off performa multivariat.
-7. `perbandingan-skenario.csv` — File CSV yang memuat seluruh nilai kuadran CM, metrik utama, spesifisitas, FPR, dan FNR tiap skenario.
+Semua artefak visualisasi dan data tersimpan di folder `output/`:
+1. `perbandingan-skenario-lengkap.csv` — Data CSV memuat seluruh sel Confusion Matrix dan metrik lengkap dari 9 konfigurasi model.
+2. `gambar-4-18-perbandingan-kinerja.png` — Multi-panel grafik perbandingan Akurasi, Presisi, Recall, dan F1-Score untuk seluruh model.
+3. `perbandingan-kesalahan-klinis.png` — Diagram batang analisis kesalahan klinis: Alarm Palsu (FP) vs Luput (FN).
+4. `perbandingan-radar.png` — Radar chart multidimensi membandingkan model terbaik tiap algoritma (skenario RUS).
+5. `tabel-ranking-model.png` — Visualisasi tabel ranking model terbaik berdasarkan F1-Score dan Recall.
 
 ---
 
-## Ringkasan Hasil Kinerja
+## Ringkasan Kinerja Lengkap (9 Model)
 
-| Skenario | Akurasi | Presisi | Recall | F1-Score | FP (Alarm Palsu) | FN (Luput) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| Baseline (Original) | 77.18% | 75.76% | 49.02% | 59.52% | 8 pasien | 26 pasien |
-| Oversampling (SMOTE) | 69.80% | 54.41% | 72.55% | 62.18% | 31 pasien | 14 pasien |
-| **Undersampling (RUS)** | **74.50%** | **59.42%** | **80.39%** | **68.33%** | **28 pasien** | **10 pasien** |
+| No | Algoritma | Skenario | Akurasi | Presisi | Recall | F1-Score | FP (Alarm Palsu) | FN (Luput) |
+|:---:|---|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | **SVM** | **RUS** | **75.84%** | **61.90%** | **76.47%** | **68.42%** | 24 pasien | **12 pasien** |
+| 2 | Decision Tree | RUS | 74.50% | 59.42% | **80.39%** | 68.33% | 28 pasien | **10 pasien** |
+| 3 | SVM | SMOTE | 75.17% | 62.50% | 68.63% | 65.42% | 21 pasien | 16 pasien |
+| 4 | Naive Bayes | RUS | 72.48% | 57.81% | 72.55% | 64.35% | 27 pasien | 14 pasien |
+| 5 | Decision Tree | SMOTE | 69.80% | 54.41% | 72.55% | 62.18% | 31 pasien | 14 pasien |
+| 6 | Naive Bayes | SMOTE | 69.13% | 53.62% | 72.55% | 61.67% | 32 pasien | 14 pasien |
+| 7 | Decision Tree | Original | 77.18% | 75.76% | 49.02% | 59.52% | 8 pasien | 26 pasien |
+| 8 | Naive Bayes | Original | 72.48% | 60.87% | 54.90% | 57.73% | 18 pasien | 23 pasien |
+| 9 | SVM | Original | 73.83% | 67.65% | 45.10% | 54.12% | 11 pasien | 28 pasien |
 
-**Kesimpulan Penentuan Skenario Terbaik:**  
-**Skenario 3 (Undersampling / RUS)** merupakan skenario terbaik karena menghasilkan **Recall tertinggi (80.39%)** dan **F1-Score tertinggi (68.33%)**, yang berhasil memangkas jumlah pasien diabetes yang luput dari 26 orang (baseline) menjadi hanya 10 orang. Dalam domain medis, kemampuan mendeteksi pasien yang sakit secara dini (meminimalkan *False Negative*) jauh lebih diprioritaskan daripada sekadar mengejar akurasi umum.
+---
+
+## Kesimpulan & Rekomendasi
+1. **Dampak Resampling**: Semua model baseline (Original) menderita *False Negative* tinggi (23–28 pasien diabetes luput terdeteksi). Resampling (khususnya **RUS**) terbukti memangkas pasien luput hingga tersisa 10–12 pasien serta mendongkrak Recall di atas 76%.
+2. **Model Terbaik Keseluruhan**: **SVM dengan Random Under-Sampling (SVM-RUS)** menjadi model dengan performa keseluruhan terbaik (**F1-Score 68.42%** dan **Akurasi 75.84%**), sehingga dideploy ke aplikasi web Streamlit (`app/`).
