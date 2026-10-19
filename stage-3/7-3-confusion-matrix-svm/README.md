@@ -1,55 +1,71 @@
-# Stage 3 - Confusion Matrix Support Vector Machine (SVM)
+# Stage 3 - Confusion Matrix SVM
 
 ## Pemilik
-Luthfi Alan Perdana (Anggota A - 434241052)
+Christianus Primavito
 
 ## Input
-- `stage-2/6-3-svm-and-testing/output/test-predictions.csv` — 149 baris data uji, berisi kolom kunci jawaban `Aktual (y_test)` dan hasil prediksi ketiga model SVM (`Pred_Original`, `Pred_SMOTE`, `Pred_RUS`).
-- `stage-2/6-3-svm-and-testing/output/model-metrics.csv` — digunakan untuk verifikasi dan validasi silang (*cross-validation check*) dengan hasil tahap 6.3.
+- `stage-2/6-3-svm-and-testing/output/test-predictions.csv` — 149 baris data uji, berisi kolom
+  kunci jawaban `Aktual (y_test)` dan prediksi ketiga skenario (`Pred_Original`, `Pred_SMOTE`, `Pred_RUS`)
+- `stage-2/6-3-svm-and-testing/output/model-metrics.csv` — dipakai hanya untuk pengecekan silang
+  hasil tahap ini dengan hasil pengujian tahap 6-3
 
 ## Metode
-Setiap model SVM dibandingkan hasil prediksinya dengan ground truth/kunci jawaban (`y_test`), kemudian dihitung Confusion Matrix 2x2.
-Empat kuadran sel Confusion Matrix dianalisis dalam konteks medis diagnosis diabetes:
+Setiap prediksi dibandingkan dengan kunci jawaban, lalu dihitung confusion matrix-nya.
+Empat sel confusion matrix diberi nama:
 
-- **Benar Sehat (True Negative / TN)**: Pasien kenyataannya tidak diabetes, dan diprediksi tidak diabetes.
-- **Alarm Palsu (False Positive / FP)**: Pasien kenyataannya tidak diabetes, tetapi diprediksi diabetes.
-- **Luput (False Negative / FN)**: Pasien kenyataannya diabetes, tetapi diprediksi tidak diabetes (berbahaya secara klinis / berisiko fatal tanpa penanganan).
-- **Benar Diabetes (True Positive / TP)**: Pasien kenyataannya diabetes, dan diprediksi diabetes.
+- **Benar Sehat** (True Negative) — kenyataan tidak diabetes, diprediksi tidak diabetes
+- **Alarm Palsu** (False Positive) — kenyataan tidak diabetes, diprediksi diabetes
+- **Luput** (False Negative) — kenyataan diabetes, diprediksi tidak diabetes
+- **Benar Diabetes** (True Positive) — kenyataan diabetes, diprediksi diabetes
 
-Dari keempat sel diturunkan metrik evaluasi formal:
+Dari keempat sel tersebut diturunkan empat metrik:
 
 ```text
-Accuracy  = (Benar Sehat + Benar Diabetes) / Jumlah Seluruh Data Uji
+Accuracy  = (Benar Sehat + Benar Diabetes) / jumlah seluruh data uji
 Precision = Benar Diabetes / (Benar Diabetes + Alarm Palsu)
 Recall    = Benar Diabetes / (Benar Diabetes + Luput)
 F1-Score  = 2 x (Precision x Recall) / (Precision + Recall)
 ```
 
 ## Cara Menjalankan
-Dijalankan dari root repository (`Diabetes-Machine-Learning`) dengan virtual environment `.venv` yang aktif:
+Dijalankan dari root repository (folder `Diabetes-Machine-Learning`), dengan `.venv` sudah aktif:
 
 ```bash
 python stage-3/7-3-confusion-matrix-svm/confusion-matrix.py
 ```
 
 ## Output
-- `output/evaluation-metrics.csv` — Confusion matrix dan 4 metrik evaluasi untuk ketiga skenario SVM.
-- `output/confusion-matrix-persen.png` — Heatmap confusion matrix ketiga skenario dalam persentase per baris aktual.
-- `output/perbandingan-metrik.png` — Diagram batang komparasi 4 metrik evaluasi ketiga skenario.
-- `output/perbandingan-kesalahan.png` — Diagram batang analisis kesalahan klasifikasi klinis (Alarm Palsu vs Luput).
+- `output/evaluation-metrics.csv` — confusion matrix dan empat metrik untuk ketiga skenario
+- `output/confusion-matrix-persen.png` — confusion matrix ketiga skenario dalam persen per baris
+- `output/perbandingan-metrik.png` — grafik batang empat metrik pada ketiga skenario
+- `output/perbandingan-kesalahan.png` — grafik batang jumlah alarm palsu dan luput tiap skenario
 
-## Hasil Evaluasi Ringkas
+Bukti output di terminal disimpan sebagai screenshot di folder `output/`.
 
-| Skenario | TN (Benar Sehat) | FP (Alarm Palsu) | FN (Luput) | TP (Benar Diabetes) | Accuracy | Precision | Recall | F1-Score |
+## Hasil
+
+| Skenario | Benar Sehat | Alarm Palsu | Luput | Benar Diabetes | Accuracy | Precision | Recall | F1-Score |
 |---|---|---|---|---|---|---|---|---|
-| **Original** | 87 | 11 | 28 | 23 | 73.83% | 67.65% | 45.10% | 54.12% |
-| **SMOTE** | 77 | 21 | 16 | 35 | 75.17% | 62.50% | 68.63% | 65.42% |
-| **RUS** | 74 | 24 | 12 | 39 | 75.84% | 61.90% | 76.47% | 68.42% |
+| Original | 87 | 11 | 28 | 23 | 0.7383 | 0.6765 | 0.4510 | 0.5412 |
+| SMOTE | 77 | 21 | 16 | 35 | 0.7517 | 0.6250 | 0.6863 | 0.6542 |
+| RUS | 74 | 24 | 12 | 39 | 0.7584 | 0.6190 | 0.7647 | 0.6842 |
 
-## Catatan Analisis Medis
-- Normalisasi persentase per baris dilakukan karena data uji memiliki distribusi kelas imbalanced (98 Sehat vs 51 Diabetes).
-- Model baseline (**SVM-Original**) memiliki sensitivitas/Recall yang sangat rendah (45.10%), di mana **28 pasien diabetes luput terdiagnosis**. Hal ini sangat berbahaya dalam skenario skrining klinis.
-- Penerapan teknik resampling (**SMOTE** dan **RUS**) berhasil mendongkrak Recall secara dramatis:
-  - **SMOTE** menurunkan angka luput menjadi 16 pasien (Recall 68.63%, F1-Score 65.42%).
-  - **RUS** menekan angka luput menjadi hanya 12 pasien (Recall 76.47%, F1-Score 68.42%).
-- **Skenario RUS (Random Under Sampling)** merupakan model terbaik untuk SVM pada dataset ini, menghasilkan **Akurasi tertinggi (75.84%)**, **Recall tertinggi (76.47%)**, dan **F1-Score tertinggi (68.42%)**.
+Pola yang muncul sama seperti Decision Tree dan Naive Bayes: RUS memberi keseimbangan terbaik,
+sedangkan skenario Original paling jarang salah tuduh tetapi paling banyak meluputkan pasien
+diabetes (28 dari 51).
+
+## Catatan
+- Confusion matrix ditampilkan dalam **persen per baris** karena jumlah kelas pada data uji tidak
+  seimbang (98 tidak diabetes dan 51 diabetes). Angka mentah membuat kelas yang jumlahnya sedikit
+  terlihat remeh, sedangkan versi persen memperlihatkan proporsi kesalahan tiap kelas secara adil.
+- `Precision` dan `Recall` dihitung untuk kelas **1 (diabetes)** sebagai kelas positif.
+- Angka pada tahap ini dihitung dari prediksi tahap 6-3 yang sama, sehingga hasilnya sama dengan
+  `model-metrics.csv`. Pencocokan tersebut dicetak di akhir script sebagai pengecekan.
+- Menjalankan ulang pelatihan SVM (`SVC` kernel rbf + `CalibratedClassifierCV`) menghasilkan
+  prediksi yang identik, sehingga angka pada tahap ini dapat direproduksi dari input tahap 6-3.
+- Model SVM dilatih memakai data yang sudah ditransformasi pada tahap 4.
+
+## Handoff untuk Tahap Berikutnya
+- `stage-3/8-compare-and-visualitation` dapat memakai `evaluation-metrics.csv` beserta grafik pada
+  folder `output/` untuk membandingkan kinerja Decision Tree, Naive Bayes, dan SVM.
+- Angka pada `evaluation-metrics.csv` menjadi dasar penulisan bagian evaluasi SVM pada laporan.
