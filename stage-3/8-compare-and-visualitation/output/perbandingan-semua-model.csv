@@ -1,0 +1,10 @@
+Algoritma,Model,Skenario,Model_Lengkap,Benar_Sehat,Alarm_Palsu,Luput,Benar_Diabetes,Accuracy,Precision,Recall,F1-Score,Specificity,FPR,FNR,Total_Uji
+Decision Tree,Original,Baseline (Data Asli),Decision Tree (Original),90,8,26,25,0.7718,0.7576,0.4902,0.5952,0.9184,0.0816,0.5098,149
+Decision Tree,SMOTE,Oversampling (SMOTE),Decision Tree (SMOTE),67,31,14,37,0.698,0.5441,0.7255,0.6218,0.6837,0.3163,0.2745,149
+Decision Tree,RUS,Undersampling (RUS),Decision Tree (RUS),70,28,10,41,0.745,0.5942,0.8039,0.6833,0.7143,0.2857,0.1961,149
+Naive Bayes,Original,Baseline (Data Asli),Naive Bayes (Original),80,18,23,28,0.7248,0.6087,0.549,0.5773,0.8163,0.1837,0.451,149
+Naive Bayes,SMOTE,Oversampling (SMOTE),Naive Bayes (SMOTE),66,32,14,37,0.6913,0.5362,0.7255,0.6167,0.6735,0.3265,0.2745,149
+Naive Bayes,RUS,Undersampling (RUS),Naive Bayes (RUS),71,27,14,37,0.7248,0.5781,0.7255,0.6435,0.7245,0.2755,0.2745,149
+SVM,Original,Baseline (Data Asli),SVM (Original),87,11,28,23,0.7383,0.6765,0.451,0.5412,0.8878,0.1122,0.549,149
+SVM,SMOTE,Oversampling (SMOTE),SVM (SMOTE),77,21,16,35,0.7517,0.625,0.6863,0.6542,0.7857,0.2143,0.3137,149
+SVM,RUS,Undersampling (RUS),SVM (RUS),74,24,12,39,0.7584,0.619,0.7647,0.6842,0.7551,0.2449,0.2353,149
