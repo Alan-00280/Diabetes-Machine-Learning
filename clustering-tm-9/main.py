@@ -219,12 +219,17 @@ plt.figure(1 , figsize = (15 , 6))
 plt.plot(range(1 , 6) , cost , 'o')
 plt.plot(range(1 , 6) , cost , '-' , alpha = 0.5)
 plt.xlabel('Number of Clusters') , plt.ylabel('Cost')
- #tambahkan code disini untuk menampilkan figure
+plt.title('Elbow Method - K-Modes')
+plt.xticks(range(1, 6))
+plt.savefig(os.path.join(OUTPUT_DIR, '4.3_elbow_kmodes.png'), bbox_inches='tight')
+plt.show()
+plt.close()
 
 
 # 4.4 Hasil Clustering
 # 11 # Membangun K-Modes
-algorithm = (KModes(n_clusters =  # isi nilai n sesuai dengan hasil elbow, init = 'Huang', n_init = 5, verbose = 0, random_state = 111) )
+# k=3 dipilih berdasarkan Elbow Method (titik siku paling jelas di k=3)
+algorithm = KModes(n_clusters=3, init='Huang', n_init=5, verbose=0, random_state=111)
 algorithm.fit(X1)
 labels2 = algorithm.labels_
 centroids2 = algorithm.cluster_centroids_
@@ -240,7 +245,10 @@ plt.clf()
 plt.scatter(x = X1_encoded[:, 0], y = X1_encoded[:, 1], c = labels2, cmap = plt.cm.Pastel2, s = 200, alpha = 0.6)
 plt.ylabel('Feature 2 (Encoded)') , plt.xlabel('Feature 1 (Encoded)')
 plt.title('Visualisasi Cluster K-Modes')
- #tambahkan code disini untuk menampilkan figure
+plt.colorbar(label='Cluster')
+plt.savefig(os.path.join(OUTPUT_DIR, '4.4_scatter_cluster.png'), bbox_inches='tight')
+plt.show()
+plt.close()
 
 
 # 4.5 Evaluasi Model
