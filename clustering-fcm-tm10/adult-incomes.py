@@ -17,7 +17,7 @@ from sklearn.decomposition import PCA
 
 # Direktori kerja dan output untuk menyimpan gambar visualisasi dan eksplorasi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, 'output-visualisasi-dan-eksplorasi')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output-visualisasi-dan-eksplorasi-adult-incomes')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 2 # import data

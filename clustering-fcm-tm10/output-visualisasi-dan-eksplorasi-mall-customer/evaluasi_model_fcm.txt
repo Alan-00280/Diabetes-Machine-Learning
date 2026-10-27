@@ -1,0 +1,27 @@
+=== RINGKASAN EVALUASI FUZZY C-MEANS (MALL CUSTOMERS) ===
+Dataset: Mall_Customers.csv
+Fitur: Annual Income (k$), Spending Score (1-100)
+Jumlah Baris: 200
+Jumlah Cluster (c): 5
+Fuzzifier (m): 2.0
+Iterasi Konvergensi: 27
+FPC: 0.6711
+Silhouette Score: 0.5547
+
+Centroid Skala Asli:
+         Annual Income (k$)  Spending Score (1-100)
+Cluster                                            
+0                 86.129582               16.699855
+1                 27.070533               18.534581
+2                 56.225628               49.576923
+3                 84.418233               82.802695
+4                 26.458903               77.897326
+
+Rata-rata per Cluster:
+         Annual Income (k$)  Spending Score (1-100)
+cluster                                            
+0                 88.200000               17.114286
+1                 26.304348               20.913043
+2                 55.296296               49.518519
+3                 86.538462               82.128205
+4                 25.727273               79.363636
