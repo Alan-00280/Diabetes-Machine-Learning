@@ -1,0 +1,25 @@
+=== RINGKASAN EVALUASI CLUSTERING FUZZY C-MEANS (TM10) ===
+Dataset: adult-incomes-dataset.csv
+Fitur: age, educational-num, hours-per-week
+Jumlah Baris: 48842
+Jumlah Cluster (c): 3
+Fuzzifier (m): 2.0
+Iterasi Konvergensi: 50
+FPC: 0.5335
+Silhouette Score: 0.2999
+Davies-Bouldin Index: 1.1979
+Calinski-Harabasz Index: 20388.16
+
+Centroid Skala Asli:
+               age  educational-num  hours-per-week
+Cluster                                            
+0        28.324055         9.473947       38.370783
+1        49.598105         9.428540       39.541547
+2        40.024286        11.796143       47.699896
+
+Distribusi Income (%):
+income       <=50K       >50K
+cluster                      
+0        92.462260   7.537740
+1        75.618567  24.381433
+2        54.459933  45.540067
