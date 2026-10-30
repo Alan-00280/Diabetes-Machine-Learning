@@ -1,0 +1,4 @@
+Cluster,Jumlah_Anggota,Persen_Anggota,Silhouette
+Cluster 0,17558,35.95,0.0907
+Cluster 1,10333,21.16,0.2121
+Cluster 2,20951,42.9,0.4104

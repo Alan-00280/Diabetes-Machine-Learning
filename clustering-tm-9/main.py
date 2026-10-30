@@ -251,8 +251,177 @@ plt.show()
 plt.close()
 
 
+# ==============================================================================
 # 4.5 Evaluasi Model
-# 14 # Melihat nilai Silhouette Score
-score2 = silhouette_score(X1_encoded, labels2)
-print("Silhouette Score: ", score2)
+# K-Modes tidak punya "akurasi", jadi kualitas cluster dievaluasi dari beberapa sisi:
+#   1) cost tiap nilai k   -> seberapa besar ketidakmiripan di dalam cluster
+#   2) Silhouette Score    -> seberapa baik cluster terpisah satu sama lain
+#   3) ukuran cluster      -> apakah jumlah anggota antar cluster seimbang
+#   4) profil cluster      -> ciri khas (kategori dominan) tiap cluster
+#   5) uji kestabilan      -> apakah cluster tetap sama saat seed diubah
+# Catatan: K-Modes bekerja pada data kategorikal, sehingga kemiripan antar data
+# diukur dengan JARAK HAMMING (proporsi fitur yang nilainya berbeda), bukan
+# jarak Euclidean atas hasil label-encoding.
+# ==============================================================================
+
+from scipy.spatial.distance import pdist, squareform
+from sklearn.metrics import (adjusted_rand_score, silhouette_samples,
+                             silhouette_score)
+
+OUTPUT_EVAL = os.path.join(BASE_DIR, 'output-evaluasi-model')
+os.makedirs(OUTPUT_EVAL, exist_ok=True)
+
+FITUR = ['workclass', 'education', 'marital-status', 'occupation',
+         'relationship', 'race', 'gender']
+
+print("\n" + "=" * 70)
+print("4.5 EVALUASI MODEL K-MODES")
+print("=" * 70)
+
+# 14a # Cost tiap nilai k (dari tahap 4.3) dan cost model akhir
+print("\n[1] COST TIAP NILAI K (semakin kecil, semakin rapat isi cluster)")
+for nilai_k, nilai_cost in zip(range(1, 6), cost):
+    tanda = "   <-- dipilih" if nilai_k == 3 else ""
+    print(f"    k={nilai_k}: cost={nilai_cost:>12,.2f}{tanda}")
+
+# 14b # Silhouette Score dengan jarak Hamming
+# Perhitungan pada seluruh 48.842 baris memerlukan matriks jarak berukuran
+# 48.842 x 48.842, yaitu sekitar 9,5 GB, sehingga dipakai sampel acak 5.000 baris.
+UKURAN_SAMPEL = 5000
+
+
+def matriks_jarak_hamming(data_kategorikal):
+    """Jarak Hamming: proporsi fitur yang nilainya berbeda antara dua data."""
+    kode = np.column_stack([
+        pd.factorize(data_kategorikal[:, j])[0]
+        for j in range(data_kategorikal.shape[1])
+    ])
+    return squareform(pdist(kode, metric='hamming'))
+
+
+rng = np.random.default_rng(42)
+idx_sampel = rng.choice(len(X1), size=UKURAN_SAMPEL, replace=False)
+X_sampel = X1[idx_sampel]
+y_sampel = labels2[idx_sampel]
+
+jarak_hamming = matriks_jarak_hamming(X_sampel)
+silhouette_hamming = silhouette_score(jarak_hamming, y_sampel, metric='precomputed')
+silhouette_tiap_data = silhouette_samples(jarak_hamming, y_sampel, metric='precomputed')
+
+# Pembanding: cara label-encoding + jarak Euclidean (kurang tepat untuk data kategorikal)
+silhouette_euclid = silhouette_score(X1_encoded[idx_sampel], y_sampel, metric='euclidean')
+
+print(f"\n[2] SILHOUETTE SCORE (sampel acak {UKURAN_SAMPEL:,} baris, seed=42)")
+print(f"    Jarak Hamming (tepat untuk data kategorikal) : {silhouette_hamming:>7.4f}")
+print(f"    Jarak Euclidean atas label-encoding          : {silhouette_euclid:>7.4f}")
+print("    Nilai mendekati 1 berarti cluster rapat dan terpisah dengan baik.")
+
+# 14c # Ukuran dan kualitas tiap cluster
+print("\n[3] UKURAN DAN KUALITAS TIAP CLUSTER")
+for cluster in sorted(set(labels2)):
+    jumlah = int((labels2 == cluster).sum())
+    sil_cluster = silhouette_tiap_data[y_sampel == cluster].mean()
+    print(f"    Cluster {cluster}: {jumlah:>6,} anggota ({jumlah / len(labels2) * 100:5.2f}%)"
+          f" | silhouette={sil_cluster:>7.4f}")
+
+# 14d # Profil tiap cluster (kategori dominan dari centroid)
+tabel_centroid = pd.DataFrame(centroids2, columns=FITUR)
+print("\n[4] PROFIL TIAP CLUSTER (kategori paling dominan)")
+print(tabel_centroid.to_string())
+
+tabel_profil = pd.DataFrame(index=FITUR,
+                            columns=[f"Cluster {i}" for i in range(3)],
+                            dtype=float)
+for i in range(3):
+    anggota = X1[labels2 == i]
+    for j, fitur in enumerate(FITUR):
+        tabel_profil.loc[fitur, f"Cluster {i}"] = round(
+            (anggota[:, j] == centroids2[i][j]).mean() * 100, 1
+        )
+print("\n    Persentase anggota yang nilainya sama dengan kategori dominan:")
+print(tabel_profil.to_string())
+
+# 14e # Uji kestabilan: jalankan ulang dengan seed berbeda, bandingkan dengan ARI
+print("\n[5] UJI KESTABILAN (K-Modes dijalankan ulang dengan seed berbeda)")
+daftar_seed = [111, 7, 42, 2024]
+label_per_seed = {}
+for seed in daftar_seed:
+    km_seed = KModes(n_clusters=3, init='Huang', n_init=5, verbose=0, random_state=seed)
+    label_per_seed[seed] = km_seed.fit_predict(X1)
+    print(f"    seed={seed:<5} cost={km_seed.cost_:>12,.2f}")
+
+print("\n    Adjusted Rand Index antar hasil (1,0000 berarti cluster identik):")
+ari = np.zeros((len(daftar_seed), len(daftar_seed)))
+for a in range(len(daftar_seed)):
+    for b in range(len(daftar_seed)):
+        ari[a, b] = adjusted_rand_score(
+            label_per_seed[daftar_seed[a]], label_per_seed[daftar_seed[b]]
+        )
+print(pd.DataFrame(ari, index=daftar_seed, columns=daftar_seed).round(4).to_string())
+print(f"\n    Rata-rata ARI antar seed berbeda: {ari[np.triu_indices(len(daftar_seed), 1)].mean():.4f}")
+
+# 14f # Grafik hasil evaluasi
+# Grafik 1: silhouette tiap cluster
+plt.figure(figsize=(8, 5))
+daftar_cluster = sorted(set(labels2))
+nilai_sil = [silhouette_tiap_data[y_sampel == c].mean() for c in daftar_cluster]
+plt.bar([f'Cluster {c}' for c in daftar_cluster], nilai_sil, color='#4C72B0')
+plt.axhline(silhouette_hamming, color='red', linestyle='--',
+            label=f'Rata-rata = {silhouette_hamming:.4f}')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score Tiap Cluster (Jarak Hamming)')
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_EVAL, '4.5_silhouette_tiap_cluster.png'), bbox_inches='tight')
+plt.close()
+
+# Grafik 2: ukuran tiap cluster
+plt.figure(figsize=(8, 5))
+jumlah_anggota = [int((labels2 == c).sum()) for c in daftar_cluster]
+plt.bar([f'Cluster {c}' for c in daftar_cluster], jumlah_anggota, color='#55A868')
+for i, jumlah in enumerate(jumlah_anggota):
+    plt.text(i, jumlah, f'{jumlah:,}', ha='center', va='bottom')
+plt.ylabel('Jumlah Anggota')
+plt.title('Ukuran Tiap Cluster (dari 48.842 data)')
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_EVAL, '4.5_ukuran_cluster.png'), bbox_inches='tight')
+plt.close()
+
+# Grafik 3: heatmap profil cluster
+plt.figure(figsize=(8, 7))
+sns.heatmap(tabel_profil.astype(float), annot=True, fmt='.1f', cmap='YlGnBu',
+            cbar_kws={'label': 'Persen anggota sesuai kategori dominan'})
+plt.title('Profil Tiap Cluster\n(persen anggota sesuai kategori dominan)')
+plt.ylabel('Fitur')
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_EVAL, '4.5_profil_cluster.png'), bbox_inches='tight')
+plt.close()
+
+# Grafik 4: heatmap kestabilan
+plt.figure(figsize=(7, 6))
+sns.heatmap(ari, annot=True, fmt='.3f', cmap='rocket_r', vmin=0, vmax=1,
+            xticklabels=daftar_seed, yticklabels=daftar_seed,
+            cbar_kws={'label': 'Adjusted Rand Index'})
+plt.xlabel('Seed')
+plt.ylabel('Seed')
+plt.title('Kestabilan Cluster Antar Seed')
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_EVAL, '4.5_kestabilan_ari.png'), bbox_inches='tight')
+plt.close()
+
+# 14g # Menyimpan rangkuman evaluasi ke CSV
+df_evaluasi = pd.DataFrame({
+    'Cluster': [f'Cluster {c}' for c in daftar_cluster],
+    'Jumlah_Anggota': jumlah_anggota,
+    'Persen_Anggota': [round(j / len(labels2) * 100, 2) for j in jumlah_anggota],
+    'Silhouette': [round(s, 4) for s in nilai_sil],
+})
+df_evaluasi.to_csv(os.path.join(OUTPUT_EVAL, '4.5_rangkuman_evaluasi.csv'), index=False)
+
+print("\n=== RINGKASAN EVALUASI ===")
+print(df_evaluasi.to_string(index=False))
+print(f"\nSilhouette Score (Hamming) : {silhouette_hamming:.4f}")
+print(f"Cost model akhir (k=3)     : {algorithm.cost_:,.2f}")
+print(f"Rata-rata ARI antar seed   : {ari[np.triu_indices(len(daftar_seed), 1)].mean():.4f}")
+print(f"\nGrafik evaluasi tersimpan di: {OUTPUT_EVAL}")
 
