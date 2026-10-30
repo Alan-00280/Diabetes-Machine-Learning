@@ -1,0 +1,5 @@
+cluster,jumlah_anggota,persen_anggota,silhouette,modus_income,modus_spending,rata_income,rata_spending
+0,52,26.0,0.5765,Sedang,Tinggi,54.1,59.9
+1,47,23.5,0.5234,Sangat Tinggi,Sangat Tinggi,68.6,83.2
+2,50,25.0,0.5915,Sangat Tinggi,Rendah,67.1,15.7
+3,51,25.5,0.6045,Sedang,Sedang,53.3,43.7

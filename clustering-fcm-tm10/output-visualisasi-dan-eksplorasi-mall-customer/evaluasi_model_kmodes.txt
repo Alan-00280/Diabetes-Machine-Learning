@@ -1,0 +1,35 @@
+=== RINGKASAN EVALUASI CLUSTERING K-MODES (TM10) ===
+Dataset: Mall_Customers.csv
+Fitur: Annual Income (k$), Spending Score (1-100)
+Jumlah Baris: 200
+Jumlah Cluster (k): 4
+Binning: kuantil 4 tingkat (Rendah, Sedang, Tinggi, Sangat Tinggi)
+Cost akhir: 116.00
+Silhouette Score (Hamming): 0.5749
+Silhouette Score (Euclidean atas label-encoding): 0.3525
+Rata-rata ARI antar seed: 0.6779
+
+Uji Sensitivitas Binning dan Jumlah Cluster:
+ binning  k  cost  silhouette  rata_ari
+       4  3 154.0      0.3053    0.2596
+       4  4 116.0      0.5749    0.6779
+       4  5 102.0      0.4930    0.4092
+       5  3 189.0      0.2789    0.3135
+       5  4 156.0      0.2990    0.3775
+       5  5 127.0      0.5346    0.4188
+
+Modus Tiap Cluster:
+        Income_Kategori Spending_Kategori
+cluster                                  
+0                Sedang            Tinggi
+1         Sangat Tinggi     Sangat Tinggi
+2         Sangat Tinggi            Rendah
+3                Sedang            Sedang
+
+Rata-rata Nilai Asli per Cluster:
+         Annual Income (k$)  Spending Score (1-100)
+cluster                                            
+0                      54.1                    59.9
+1                      68.6                    83.2
+2                      67.1                    15.7
+3                      53.3                    43.7
