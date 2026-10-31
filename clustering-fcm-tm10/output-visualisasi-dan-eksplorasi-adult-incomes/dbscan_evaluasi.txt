@@ -7,6 +7,7 @@ minPts        : 5
 Jumlah Cluster: 2
 Jumlah Noise  : 2 (0.0%)
 Silhouette    : 0.30648697129334496
+Davies-Bouldin: 0.6034437107975182
 
 Tabel Tuning:
  eps  minPts  n_clusters  n_noise  pct_noise  silhouette

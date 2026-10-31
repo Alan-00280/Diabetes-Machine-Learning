@@ -17,7 +17,7 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, davies_bouldin_score
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output-visualisasi-dan-eksplorasi-mall-customer')
@@ -162,10 +162,13 @@ for u, c in zip(unique, counts):
 if n_clusters_final >= 2:
     non_noise_mask = labels_final != -1
     sil_final = silhouette_score(X_scaled[non_noise_mask], labels_final[non_noise_mask])
+    dbi_final = davies_bouldin_score(X_scaled[non_noise_mask], labels_final[non_noise_mask])
     print(f"\nSilhouette Score (tanpa noise): {sil_final:.4f}")
+    print(f"Davies-Bouldin Index (tanpa noise): {dbi_final:.4f}")
 else:
     sil_final = np.nan
-    print("\nSilhouette Score: tidak bisa dihitung (cluster < 2)")
+    dbi_final = np.nan
+    print("\nSilhouette Score & DBI: tidak bisa dihitung (cluster < 2)")
 
 # Tambahkan label ke dataframe
 df['dbscan_cluster'] = labels_final
@@ -255,7 +258,8 @@ with open(eval_path, 'w') as f:
     f.write(f"minPts        : {best_minpts}\n")
     f.write(f"Jumlah Cluster: {n_clusters_final}\n")
     f.write(f"Jumlah Noise  : {n_noise_final} ({pct_noise_final:.1f}%)\n")
-    f.write(f"Silhouette    : {sil_final:.4f}\n\n")
+    f.write(f"Silhouette    : {sil_final:.4f}\n")
+    f.write(f"Davies-Bouldin: {dbi_final:.4f}\n\n")
     f.write("Tabel Tuning:\n")
     f.write(df_results.to_string(index=False))
 
