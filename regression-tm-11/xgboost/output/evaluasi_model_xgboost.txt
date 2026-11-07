@@ -1,0 +1,38 @@
+=== RINGKASAN EVALUASI XGBOOST (TM11) ===
+Dataset: housing.csv (California Housing)
+Jumlah Data Latih: 16512
+Jumlah Data Uji  : 4128
+Jumlah Fitur     : 12
+
+Parameter Terbaik:
+  colsample_bytree: 0.8
+  learning_rate: 0.1
+  max_depth: 7
+  n_estimators: 400
+  subsample: 0.8
+  skema tuning: GridSearchCV + TimeSeriesSplit(n_splits=5)
+  RMSE validasi silang terbaik: 90188.01
+
+Metrik Evaluasi:
+        Data Latih      Data Uji
+MAE   1.106309e+04  7.386946e+04
+MSE   2.353494e+08  9.073338e+09
+RMSE  1.534110e+04  9.525407e+04
+R2    9.829000e-01 -6.200000e-02
+
+Feature Importance (tertinggi):
+  ocean_proximity_enc: 0.4732
+  median_income: 0.2359
+  population_per_household: 0.0822
+  longitude: 0.0453
+  latitude: 0.0322
+  rooms_per_household: 0.0310
+  housing_median_age: 0.0289
+  bedrooms_per_room: 0.0208
+  population: 0.0137
+  households: 0.0130
+  total_bedrooms: 0.0122
+  total_rooms: 0.0116
+
+Residual - rata-rata: -58912.81
+Residual - standar deviasi: 74850.64
