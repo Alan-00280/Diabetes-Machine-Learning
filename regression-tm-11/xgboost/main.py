@@ -22,8 +22,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.metrics import (mean_absolute_error, mean_squared_error,
-                             r2_score)
+from sklearn.metrics import (mean_absolute_error,
+                             mean_absolute_percentage_error,
+                             mean_squared_error, r2_score)
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 
 # ==============================================================================
@@ -113,7 +114,13 @@ model = xgb.XGBRegressor(
     n_jobs=-1,
     **pencarian.best_params_,
 )
-model.fit(X_train, y_train)
+# eval_set hanya dipakai untuk mencatat perkembangan tiap 50 pohon,
+# tidak memengaruhi proses pelatihan model
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_train, y_train), (X_test, y_test)],
+    verbose=50,
+)
 print("Model selesai dilatih dengan parameter terbaik.")
 
 # ==============================================================================
@@ -191,6 +198,15 @@ print("=" * 70)
 y_pred_latih = model.predict(X_train)
 y_pred_uji = model.predict(X_test)
 
+# Cuplikan perbandingan nilai aktual dan prediksi pada data uji
+print("\nCuplikan perbandingan aktual vs prediksi (10 data uji pertama):")
+cuplikan = pd.DataFrame({
+    'Aktual': y_test.to_numpy()[:10],
+    'Prediksi XGBoost': y_pred_uji[:10],
+})
+cuplikan['Selisih'] = cuplikan['Aktual'] - cuplikan['Prediksi XGBoost']
+print(cuplikan.round(2).to_string(index=False))
+
 
 def hitung_metrik(aktual, prediksi):
     mse = mean_squared_error(aktual, prediksi)
@@ -198,6 +214,7 @@ def hitung_metrik(aktual, prediksi):
         'MAE': mean_absolute_error(aktual, prediksi),
         'MSE': mse,
         'RMSE': np.sqrt(mse),
+        'MAPE (%)': mean_absolute_percentage_error(aktual, prediksi) * 100,
         'R2': r2_score(aktual, prediksi),
     }
 
