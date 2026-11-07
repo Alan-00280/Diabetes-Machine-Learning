@@ -1,0 +1,12 @@
+=== LAPORAN EVALUASI MODEL REGRESI LIGHTGBM ===
+Waktu Training : 1.99 detik
+1. MAE         : $77,759.75
+2. MSE         : 10,514,216,092.23
+3. RMSE        : $102,538.85
+4. MAPE        : 68.51%
+5. R2 Score    : -0.2306 (-23.06%)
+
+Performa Train vs Test:
+  - Train R2   : 0.9726
+  - Test R2    : -0.2306
+  - Gap R2     : 1.2032 (Model Seimbang / Tidak Overfit Ekstrem)
