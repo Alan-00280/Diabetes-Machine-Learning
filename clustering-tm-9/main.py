@@ -71,7 +71,13 @@ plt.show()
 plt.close()
 
 # Penanganan outlier: Capping (Winsorization) dengan batas IQR agar tidak menghilangkan data
+# capital-gain dan capital-loss tidak dilakukan capping karena IQR-nya bernilai nol,
+# sehingga seluruh nilai akan berubah menjadi nol. Kedua kolom cukup dikategorikan
+# menjadi nol dan lebih dari nol pada langkah kategorisasi di bawah.
+TANPA_CAPPING = ['capital-gain', 'capital-loss']
 for col in numeric_cols:
+    if col in TANPA_CAPPING:
+        continue
     q1 = df[col].quantile(0.25)
     q3 = df[col].quantile(0.75)
     iqr = q3 - q1
