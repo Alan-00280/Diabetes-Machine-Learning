@@ -1,0 +1,10 @@
+=== HASIL PREDIKSI DATA BARU (5 Sampel Data Uji) ===
+Simulasi: fitur dari 5 baris pertama data uji diumpankan ke model
+
+No         Aktual   Pred LightGBM   Selisih LGB
+--------------------------------------------------
+1          86,100          48,769        37,331
+2         129,200         108,159        21,041
+3          82,500          87,915        -5,415
+4          95,200         196,393      -101,193
+5          75,000          83,335        -8,335
