@@ -20,20 +20,20 @@ Fitur akhir:
   [11] ocean_proximity_enc
 
 Missing value:
-  total_bedrooms: 207 baris → imputasi median (435.0)
+  total_bedrooms: 207 baris -> imputasi median (435.0)
 
 Outlier capping (IQR):
-  total_rooms                   : 1287 baris → [-1102.62, 5698.38]
-  total_bedrooms                : 1306 baris → [-222.38, 1162.62]
-  population                    : 1196 baris → [-620.00, 3132.00]
-  households                    : 1220 baris → [-207.50, 1092.50]
-  median_income                 :  681 baris → [-0.71, 8.01]
-  rooms_per_household           :  511 baris → [2.02, 8.47]
-  bedrooms_per_room             :  635 baris → [0.08, 0.34]
-  population_per_household      :  711 baris → [1.15, 4.56]
+  total_rooms                   : 1287 baris -> [-1102.62, 5698.38]
+  total_bedrooms                : 1306 baris -> [-222.38, 1162.62]
+  population                    : 1196 baris -> [-620.00, 3132.00]
+  households                    : 1220 baris -> [-207.50, 1092.50]
+  median_income                 :  681 baris -> [-0.71, 8.01]
+  rooms_per_household           :  511 baris -> [2.02, 8.47]
+  bedrooms_per_room             :  635 baris -> [0.08, 0.34]
+  population_per_household      :  711 baris -> [1.15, 4.56]
 
 Encoding:
-  ocean_proximity → ordinal (INLAND=0, <1H OCEAN=1, NEAR OCEAN=2, NEAR BAY=3, ISLAND=4)
+  ocean_proximity -> ordinal (INLAND=0, <1H OCEAN=1, NEAR OCEAN=2, NEAR BAY=3, ISLAND=4)
 
 Split   : 80% train / 20% test, shuffle=False, random_state=42
 Scaling : StandardScaler (fit pada train saja)

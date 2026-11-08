@@ -1,0 +1,25 @@
+MODEL TERBAIK: XGBoost
+============================================================
+XGBoost dipilih sebagai model terbaik berdasarkan perbandingan semua metrik evaluasi pada data uji:
+  - MAE lebih rendah  : XGBoost 73,869 vs LightGBM 77,760
+  - RMSE lebih rendah : XGBoost 95,254 vs LightGBM 102,539
+  - MAPE lebih rendah : XGBoost 66.08% vs LightGBM 68.51%
+  - R2 lebih tinggi   : XGBoost -0.0620 vs LightGBM -0.2306
+Meskipun keduanya menunjukkan overfitting besar (R2 negatif pada data uji),
+XGBoost masih menghasilkan prediksi yang lebih mendekati nilai aktual.
+Penyebab utama overfitting: data dibagi berurutan berdasarkan koordinat geografis,
+sehingga data uji berasal dari wilayah dengan distribusi harga berbeda dari data latih.
+
+Metrik XGBoost (Data Uji):
+  MAE: 73,869.4583
+  MSE: 9,073,337,924.4557
+  RMSE: 95,254.0704
+  MAPE (%): 66.0796
+  R2: -0.0620
+
+Metrik LightGBM (Data Uji):
+  MAE: 77,759.7485
+  MSE: 10,514,216,092.2349
+  RMSE: 102,538.8516
+  MAPE (%): 68.5064
+  R2: -0.2306
