@@ -41,21 +41,20 @@ DATASET_PATH = os.path.join(ROOT_DIR, 'housing.csv')
 # ==============================================================================
 # 1. Load data
 # ==============================================================================
-print("=" * 60)
-print("1. LOAD DATA")
-print("=" * 60)
+print("=" * 65)
+print("4.1.1 PEMUATAN DATA — [Gambar 4.2: Output df.head() dan df.shape]")
+print("=" * 65)
 
 df = pd.read_csv(DATASET_PATH)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 1000)
 
-print("\n--- Output df.head() (5 Baris Pertama) ---")
+print("\n>>> df.head()")
 print(df.head())
 
-print(f"\n--- Output df.shape (Ukuran Dataset) ---")
-print(f"Dimensi data (baris, kolom): {df.shape}")
-print(f"Jumlah baris: {df.shape[0]:,} | Jumlah kolom: {df.shape[1]}")
-print(f"Daftar kolom: {df.columns.tolist()}")
+print(f"\n>>> df.shape")
+print(df.shape)
+print(f"Dataset berisi {df.shape[0]:,} baris dan {df.shape[1]} kolom.")
 
 # ==============================================================================
 # 2. EDA — Eksplorasi Awal

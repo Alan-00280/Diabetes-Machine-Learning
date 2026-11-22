@@ -76,9 +76,9 @@ lgb_test = {
 }
 lgb_train = {
     'MAE':      lgb_json['train_mae'],
-    'MSE':      lgb_json['train_mae'] ** 2,   # estimasi — MSE latih tidak disimpan langsung
+    'MSE':      lgb_json['train_rmse'] ** 2,  # MSE = RMSE^2
     'RMSE':     lgb_json['train_rmse'],
-    'MAPE (%)': float('nan'),                  # tidak disimpan
+    'MAPE (%)': float('nan'),                 # tidak disimpan
     'R2':       lgb_json['train_r2_score'],
 }
 
